@@ -22,7 +22,7 @@ python3 app.py
 ```
 
 ### Run with console script
-If installed in editable mode, you can use:
+If installed, you can use:
 ```bash
 phone-keyboard
 ```
