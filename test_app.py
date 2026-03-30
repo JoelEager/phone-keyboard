@@ -18,12 +18,15 @@ class FlaskHelloWorldTestCase(unittest.TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertIn(b'<form action="/submit" method="post">', response.data)
         self.assertIn(b'<textarea name="text"', response.data)
+        self.assertIn(b'name="viewport"', response.data)
+        self.assertIn(b'style', response.data)
 
-    def test_submit_route(self):
+    def test_submit_route_redirects(self):
         test_text = "This is a test message."
         response = self.app.post('/submit', data={'text': test_text})
-        self.assertEqual(response.status_code, 200)
-        self.assertIn(f'Received: {test_text}'.encode('utf-8'), response.data)
+        self.assertEqual(response.status_code, 302)
+        # Check that it redirects back to home
+        self.assertTrue(response.location.endswith('/'))
         # Verify pyautogui.write was called (on the mock)
         mock_pyautogui.write.assert_called_once_with(test_text)
         mock_pyautogui.write.reset_mock()
