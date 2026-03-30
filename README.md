@@ -4,9 +4,9 @@ A simple Flask application to enable me to type on a computer using my phone's t
 
 ## Installation
 
-### Using requirements.txt
+### Standard installation
 ```bash
-pip install -r requirements.txt
+pip install .
 ```
 
 ### Editable mode
