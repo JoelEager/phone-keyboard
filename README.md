@@ -1,6 +1,6 @@
 # Phone Keyboard
 
-A simple Flask application to enable me to type on a computer using my phone's touch and voice keyboard.
+A simple Flask application to enable me to type on a computer using my phone's touch and voice keyboard. Authored using [Google Jules](https://jules.google.com/).
 
 ## Installation
 
