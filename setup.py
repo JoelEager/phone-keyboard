@@ -1,7 +1,7 @@
 from setuptools import setup
 
 setup(
-    name='flask_hello_world',
+    name='phone-keyboard',
     version='0.1.0',
     py_modules=['app'],
     install_requires=[
@@ -9,7 +9,7 @@ setup(
     ],
     entry_points={
         'console_scripts': [
-            'flask-hello=app:main',
+            'phone-keyboard=app:main',
         ],
     },
 )

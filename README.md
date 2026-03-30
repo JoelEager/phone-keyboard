@@ -24,7 +24,7 @@ python3 app.py
 ### Run with console script
 If installed in editable mode, you can use:
 ```bash
-flask-hello
+phone-keyboard
 ```
 
 ## Running Tests
