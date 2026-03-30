@@ -1,4 +1,11 @@
 import unittest
+from unittest.mock import patch, MagicMock
+import sys
+
+# Mock pyautogui before importing app
+mock_pyautogui = MagicMock()
+sys.modules['pyautogui'] = mock_pyautogui
+
 from app import app
 
 class FlaskHelloWorldTestCase(unittest.TestCase):
@@ -17,6 +24,9 @@ class FlaskHelloWorldTestCase(unittest.TestCase):
         response = self.app.post('/submit', data={'text': test_text})
         self.assertEqual(response.status_code, 200)
         self.assertIn(f'Received: {test_text}'.encode('utf-8'), response.data)
+        # Verify pyautogui.write was called (on the mock)
+        mock_pyautogui.write.assert_called_once_with(test_text)
+        mock_pyautogui.write.reset_mock()
 
     def test_xss_protection(self):
         test_text = "<script>alert('xss')</script>"
@@ -24,6 +34,9 @@ class FlaskHelloWorldTestCase(unittest.TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertNotIn(b"<script>", response.data)
         self.assertIn(b"&lt;script&gt;", response.data)
+        # Verify pyautogui.write was called (on the mock)
+        mock_pyautogui.write.assert_called_once_with(test_text)
+        mock_pyautogui.write.reset_mock()
 
 if __name__ == '__main__':
     unittest.main()

@@ -1,7 +1,14 @@
 import socket
+import sys
 import pyperclip
 from flask import Flask, request
 from markupsafe import escape
+
+# Attempt to import pyautogui, handle cases where DISPLAY is not set
+try:
+    import pyautogui
+except Exception:
+    pyautogui = None
 
 app = Flask(__name__)
 
@@ -17,6 +24,21 @@ def hello_world():
 @app.route('/submit', methods=['POST'])
 def submit():
     text = request.form.get('text')
+
+    if text:
+        # Echo to stdout
+        print(f'Received text: {text}', file=sys.stdout)
+        sys.stdout.flush()
+
+        # Type the text using pyautogui
+        if pyautogui:
+            try:
+                pyautogui.write(text)
+            except Exception as e:
+                print(f'Error typing text: {e}', file=sys.stderr)
+        else:
+            print('Pyautogui not available (check DISPLAY environment variable)', file=sys.stderr)
+
     escaped_text = escape(text)
     return f'Received: {escaped_text}'
 
@@ -26,7 +48,7 @@ def get_local_ip():
         return socket.gethostbyname(socket.gethostname())
     except Exception:
         return '127.0.0.1'
-
+    
 def main():
     host = '0.0.0.0'
     port = 5000
