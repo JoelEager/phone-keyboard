@@ -16,6 +16,7 @@ class FlaskHelloWorldTestCase(unittest.TestCase):
     def test_home_page_form(self):
         response = self.app.get('/')
         self.assertEqual(response.status_code, 200)
+        self.assertIn(b'<title>Phone Keyboard</title>', response.data)
         self.assertIn(b'<form action="/submit" method="post">', response.data)
         self.assertIn(b'<textarea name="text"', response.data)
         self.assertIn(b'name="viewport"', response.data)
