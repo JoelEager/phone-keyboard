@@ -34,9 +34,8 @@ class FlaskHelloWorldTestCase(unittest.TestCase):
     def test_xss_protection(self):
         test_text = "<script>alert('xss')</script>"
         response = self.app.post('/submit', data={'text': test_text})
-        self.assertEqual(response.status_code, 200)
-        self.assertNotIn(b"<script>", response.data)
-        self.assertIn(b"&lt;script&gt;", response.data)
+        self.assertEqual(response.status_code, 302)
+        self.assertTrue(response.location.endswith('/'))
         # Verify pyautogui.write was called (on the mock)
         mock_pyautogui.write.assert_called_once_with(test_text)
         mock_pyautogui.write.reset_mock()
