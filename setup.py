@@ -6,6 +6,7 @@ setup(
     py_modules=['app'],
     install_requires=[
         'Flask==3.1.3',
+        'pyperclip==1.11.0',
     ],
     entry_points={
         'console_scripts': [
