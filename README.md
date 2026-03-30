@@ -1,6 +1,6 @@
-# Flask Hello World
+# Phone Keyboard
 
-A simple Flask application that returns "Hello, World!".
+A simple Flask application to enable me to type on a computer using my phone's touch and voice keyboard.
 
 ## Installation
 
