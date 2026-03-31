@@ -1,7 +1,7 @@
 import sys
 import os
 from flask import Flask, request, redirect, url_for, render_template
-from generate_cert import generate_certificate
+from generate_cert import generate_certificate, get_repo_root
 
 # Attempt to import pyautogui, handle cases where DISPLAY is not set
 try:
@@ -12,11 +12,11 @@ except Exception:
 app = Flask(__name__)
 
 @app.route('/')
-def hello_world():
+def index():
     return render_template('index.html')
 
-@app.route('/submit', methods=['POST'])
-def submit():
+@app.route('/type', methods=['POST'])
+def type_text():
     text = request.form.get('text')
 
     if text:
@@ -34,12 +34,11 @@ def submit():
             print('Pyautogui not available (check DISPLAY environment variable)', file=sys.stderr)
 
     # Redirect back to the form
-    return redirect(url_for('hello_world'))
+    return redirect(url_for('index'))
 
 def main():
     host = '0.0.0.0'
     port = 5000
-    from generate_cert import get_local_ip, get_repo_root
 
     repo_root = get_repo_root()
     cert_path = os.path.join(repo_root, "cert.pem")

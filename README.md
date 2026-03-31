@@ -21,8 +21,14 @@ pip install -e .
 python3 app.py
 ```
 
-### HTTPS and Mobile Setup
-The application is now configured to use HTTPS to enable the Screen Wake Lock API.
+### Run with console script
+If installed, you can use:
+```bash
+phone-keyboard
+```
+
+## HTTPS and Mobile Setup
+The application is configured to use HTTPS to enable the Screen Wake Lock JS API.
 
 1. **Certificate Generation**: The server will automatically generate `cert.pem` and `key.pem` the first time it runs, specific to your local IP address. These files are excluded from the repository via `.gitignore`.
 2. **Mobile Device Setup**: To avoid "Insecure Connection" warnings on your phone and enable the Wake Lock API, you must install and trust `cert.pem` on your mobile device:
@@ -35,12 +41,6 @@ The application is now configured to use HTTPS to enable the Screen Wake Lock AP
      - Transfer `cert.pem` to your device.
      - Go to `Settings > Security > More security settings > Encryption & credentials > Install a certificate > CA certificate` and select `cert.pem`.
 3. **Access**: Navigate to `https://<your-local-ip>:5000` on your mobile browser.
-
-### Run with console script
-If installed, you can use:
-```bash
-phone-keyboard
-```
 
 ## Running Tests
 ```bash

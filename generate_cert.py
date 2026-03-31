@@ -33,7 +33,7 @@ def generate_certificate(output_dir=None):
         "openssl", "req", "-x509", "-newkey", "rsa:4096",
         "-keyout", key_path, "-out", cert_path,
         "-sha256", "-days", "365", "-nodes",
-        "-subj", f"/C=US/ST=State/L=City/O=Organization/OU=Unit/CN={local_ip}",
+        "-subj", f"/C=US/ST=State/L=City/O=Joel local phone keyboard/OU=Unit/CN={local_ip}",
         "-addext", f"subjectAltName=IP:{local_ip},IP:127.0.0.1,DNS:localhost"
     ]
 
