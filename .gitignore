@@ -20,3 +20,5 @@ coverage.xml
 *.egg-info
 build/
 dist/
+cert.pem
+key.pem

@@ -1,7 +1,7 @@
-import socket
 import sys
-import pyperclip
+import os
 from flask import Flask, request, redirect, url_for, render_template
+from generate_cert import generate_certificate
 
 # Attempt to import pyautogui, handle cases where DISPLAY is not set
 try:
@@ -36,26 +36,23 @@ def submit():
     # Redirect back to the form
     return redirect(url_for('hello_world'))
 
-def get_local_ip():
-    """Returns the local IP address of the machine."""
-    try:
-        return socket.gethostbyname(socket.gethostname())
-    except Exception:
-        return '127.0.0.1'
-    
 def main():
     host = '0.0.0.0'
     port = 5000
-    local_ip = get_local_ip()
-    url = f"http://{local_ip}:{port}"
+    from generate_cert import get_local_ip, get_repo_root
 
-    try:
-        pyperclip.copy(url)
-        print(f"URL {url} copied to clipboard.")
-    except Exception as e:
-        print(f"Could not copy URL to clipboard: {e}")
+    repo_root = get_repo_root()
+    cert_path = os.path.join(repo_root, "cert.pem")
+    key_path = os.path.join(repo_root, "key.pem")
 
-    app.run(host=host, port=port)
+    # Check if certificate files exist, if not generate them
+    if not (os.path.exists(cert_path) and os.path.exists(key_path)):
+        if not generate_certificate(repo_root):
+            print("Failed to generate certificates. Starting without HTTPS.")
+            app.run(host=host, port=port)
+            return
+
+    app.run(host=host, port=port, ssl_context=(cert_path, key_path))
 
 if __name__ == '__main__':
     main()
