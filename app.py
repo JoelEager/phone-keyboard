@@ -27,7 +27,17 @@ def type_text():
         # Type the text using pyautogui
         if pyautogui:
             try:
-                pyautogui.write(text)
+                use_shift_enter = request.form.get('use_shift_enter')
+                if use_shift_enter:
+                    # Normalize line endings
+                    normalized_text = text.replace('\r\n', '\n')
+                    lines = normalized_text.split('\n')
+                    for i, line in enumerate(lines):
+                        pyautogui.write(line)
+                        if i < len(lines) - 1:
+                            pyautogui.hotkey('shift', 'enter')
+                else:
+                    pyautogui.write(text)
             except Exception as e:
                 print(f'Error typing text: {e}', file=sys.stderr)
         else:
