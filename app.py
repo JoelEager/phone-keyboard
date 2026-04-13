@@ -32,7 +32,6 @@ def type_text():
             try:
                 use_shift_enter = request.form.get('use_shift_enter')
                 if use_shift_enter:
-                    # Normalize line endings
                     normalized_text = text.replace('\r\n', '\n')
                     lines = normalized_text.split('\n')
                     for i, line in enumerate(lines):

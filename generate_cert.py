@@ -30,8 +30,7 @@ def generate_certificate(output_dir=None):
     key_path = os.path.join(output_dir, "key.pem")
 
     local_ip = get_local_ip()
-    print(f"Generating self-signed certificate for {local_ip}, "
-          "localhost, and 127.0.0.1...")
+    print(f"Generating self-signed certificate for {local_ip}")
 
     cmd = [
         "openssl", "req", "-x509", "-newkey", "rsa:4096",
@@ -49,7 +48,3 @@ def generate_certificate(output_dir=None):
         print(f"Error generating certificate: {e}")
         return False
     return True
-
-
-if __name__ == "__main__":
-    generate_certificate()
