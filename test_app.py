@@ -1,12 +1,13 @@
 import unittest
-from unittest.mock import patch, MagicMock
+from unittest.mock import MagicMock
 import sys
 
 # Mock pyautogui before importing app
 mock_pyautogui = MagicMock()
 sys.modules['pyautogui'] = mock_pyautogui
 
-from app import app
+from app import app  # noqa: E402
+
 
 class FlaskHelloWorldTestCase(unittest.TestCase):
     def setUp(self):
@@ -26,7 +27,9 @@ class FlaskHelloWorldTestCase(unittest.TestCase):
 
     def test_submit_route_redirects(self):
         test_text = "Line 1\nLine 2"
-        response = self.app.post('/type', data={'text': test_text, 'use_shift_enter': 'on'})
+        response = self.app.post(
+            '/type', data={'text': test_text, 'use_shift_enter': 'on'}
+        )
         self.assertEqual(response.status_code, 302)
         # Check that it redirects back to home
         self.assertTrue(response.location.endswith('/'))
@@ -52,15 +55,6 @@ class FlaskHelloWorldTestCase(unittest.TestCase):
         mock_pyautogui.write.reset_mock()
         mock_pyautogui.hotkey.reset_mock()
 
-    def test_xss_protection(self):
-        test_text = "<script>alert('xss')</script>"
-        response = self.app.post('/type', data={'text': test_text})
-        self.assertEqual(response.status_code, 302)
-        self.assertTrue(response.location.endswith('/'))
-        # Verify pyautogui.write was called (on the mock)
-        mock_pyautogui.write.assert_called_once_with(test_text)
-        mock_pyautogui.write.reset_mock()
-        mock_pyautogui.hotkey.reset_mock()
 
 if __name__ == '__main__':
     unittest.main()

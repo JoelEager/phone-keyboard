@@ -9,11 +9,14 @@ try:
 except Exception:
     pyautogui = None
 
+
 app = Flask(__name__)
+
 
 @app.route('/')
 def index():
     return render_template('index.html')
+
 
 @app.route('/type', methods=['POST'])
 def type_text():
@@ -41,10 +44,13 @@ def type_text():
             except Exception as e:
                 print(f'Error typing text: {e}', file=sys.stderr)
         else:
-            print('Pyautogui not available (check DISPLAY environment variable)', file=sys.stderr)
+            print('Pyautogui not available '
+                  '(check DISPLAY environment variable)',
+                  file=sys.stderr)
 
     # Redirect back to the form
     return redirect(url_for('index'))
+
 
 def main():
     host = '0.0.0.0'
@@ -62,6 +68,7 @@ def main():
             return
 
     app.run(host=host, port=port, ssl_context=(cert_path, key_path))
+
 
 if __name__ == '__main__':
     main()

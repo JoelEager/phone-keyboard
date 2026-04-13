@@ -2,9 +2,11 @@ import subprocess
 import socket
 import os
 
+
 def get_repo_root():
     """Returns the absolute path to the directory containing this script."""
     return os.path.dirname(os.path.abspath(__file__))
+
 
 def get_local_ip():
     """Returns the local IP address of the machine."""
@@ -18,8 +20,9 @@ def get_local_ip():
     except Exception:
         return '127.0.0.1'
 
+
 def generate_certificate(output_dir=None):
-    """Generates a self-signed certificate and key using openssl, including the local IP address."""
+    """Generates a self-signed certificate and key using openssl."""
     if output_dir is None:
         output_dir = get_repo_root()
 
@@ -27,13 +30,15 @@ def generate_certificate(output_dir=None):
     key_path = os.path.join(output_dir, "key.pem")
 
     local_ip = get_local_ip()
-    print(f"Generating self-signed certificate for {local_ip}, localhost, and 127.0.0.1...")
+    print(f"Generating self-signed certificate for {local_ip}, "
+          "localhost, and 127.0.0.1...")
 
     cmd = [
         "openssl", "req", "-x509", "-newkey", "rsa:4096",
         "-keyout", key_path, "-out", cert_path,
         "-sha256", "-days", "365", "-nodes",
-        "-subj", f"/C=US/ST=State/L=City/O=Joel local phone keyboard/OU=Unit/CN={local_ip}",
+        "-subj", "/C=US/ST=State/L=City/O=Joel local phone keyboard/"
+                 f"OU=Unit/CN={local_ip}",
         "-addext", f"subjectAltName=IP:{local_ip},IP:127.0.0.1,DNS:localhost"
     ]
 
@@ -44,6 +49,7 @@ def generate_certificate(output_dir=None):
         print(f"Error generating certificate: {e}")
         return False
     return True
+
 
 if __name__ == "__main__":
     generate_certificate()
