@@ -6,8 +6,13 @@ from generate_cert import generate_certificate, get_repo_root
 # Attempt to import pyautogui, handle cases where DISPLAY is not set
 try:
     import pyautogui
-except Exception:
-    pyautogui = None
+except Exception as e:
+    print(
+        f"Error: Failed to import 'pyautogui'. Ensure it is installed and "
+        f"the DISPLAY environment variable is set. Details: {e}",
+        file=sys.stderr
+    )
+    sys.exit(1)
 
 
 app = Flask(__name__)
@@ -28,24 +33,19 @@ def type_text():
         sys.stdout.flush()
 
         # Type the text using pyautogui
-        if pyautogui:
-            try:
-                use_shift_enter = request.form.get('use_shift_enter')
-                if use_shift_enter:
-                    normalized_text = text.replace('\r\n', '\n')
-                    lines = normalized_text.split('\n')
-                    for i, line in enumerate(lines):
-                        pyautogui.write(line)
-                        if i < len(lines) - 1:
-                            pyautogui.hotkey('shift', 'enter')
-                else:
-                    pyautogui.write(text)
-            except Exception as e:
-                print(f'Error typing text: {e}', file=sys.stderr)
-        else:
-            print('Pyautogui not available '
-                  '(check DISPLAY environment variable)',
-                  file=sys.stderr)
+        try:
+            use_shift_enter = request.form.get('use_shift_enter')
+            if use_shift_enter:
+                normalized_text = text.replace('\r\n', '\n')
+                lines = normalized_text.split('\n')
+                for i, line in enumerate(lines):
+                    pyautogui.write(line)
+                    if i < len(lines) - 1:
+                        pyautogui.hotkey('shift', 'enter')
+            else:
+                pyautogui.write(text)
+        except Exception as e:
+            print(f'Error typing text: {e}', file=sys.stderr)
 
     # Redirect back to the form
     return redirect(url_for('index'))
