@@ -19,11 +19,14 @@ class FlaskHelloWorldTestCase(unittest.TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertIn(b'<title>Phone Keyboard</title>', response.data)
         self.assertIn(b'<form action="/type" method="post">', response.data)
-        self.assertIn(b'<textarea name="text"', response.data)
+        self.assertIn(b'<textarea id="message_text" name="text"', response.data)
+        self.assertIn(b'autocapitalize="sentences"', response.data)
         self.assertIn(b'name="viewport"', response.data)
         self.assertIn(b'style', response.data)
         self.assertIn(b'name="use_shift_enter"', response.data)
         self.assertIn(b'checked', response.data)
+        self.assertIn(b'id="autocapitalize_toggle"', response.data)
+        self.assertIn(b'Auto-capitalize first word', response.data)
 
     def test_submit_route_redirects(self):
         test_text = "Line 1\nLine 2"
