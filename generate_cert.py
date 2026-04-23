@@ -3,28 +3,19 @@ import socket
 import os
 
 
-def get_repo_root():
-    """Returns the absolute path to the directory containing this script."""
-    return os.path.dirname(os.path.abspath(__file__))
-
-
 def get_local_ip():
     """Returns the local IP address of the machine."""
     try:
         # Create a dummy socket to determine the local IP
-        s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-        s.connect(("8.8.8.8", 80))
-        local_ip = s.getsockname()[0]
-        s.close()
-        return local_ip
+        with socket.socket(socket.AF_INET, socket.SOCK_DGRAM) as s:
+            s.connect(("8.8.8.8", 80))
+            return s.getsockname()[0]
     except Exception:
         return '127.0.0.1'
 
 
-def generate_certificate(output_dir=None):
+def generate_certificate(output_dir):
     """Generates a self-signed certificate and key using openssl."""
-    if output_dir is None:
-        output_dir = get_repo_root()
 
     cert_path = os.path.join(output_dir, "cert.pem")
     key_path = os.path.join(output_dir, "key.pem")

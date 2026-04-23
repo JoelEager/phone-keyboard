@@ -14,12 +14,18 @@ class FlaskHelloWorldTestCase(unittest.TestCase):
         self.app = app.test_client()
         self.app.testing = True
 
+    def tearDown(self):
+        mock_pyautogui.write.reset_mock()
+        mock_pyautogui.hotkey.reset_mock()
+
     def test_home_page_form(self):
         response = self.app.get('/')
         self.assertEqual(response.status_code, 200)
         self.assertIn(b'<title>Phone Keyboard</title>', response.data)
         self.assertIn(b'<form action="/type" method="post">', response.data)
-        self.assertIn(b'<textarea id="message_text" name="text"', response.data)
+        self.assertIn(
+            b'<textarea id="message_text" name="text"', response.data
+        )
         self.assertIn(b'autocapitalize="sentences"', response.data)
         self.assertIn(b'name="viewport"', response.data)
         self.assertIn(b'style', response.data)
@@ -42,9 +48,6 @@ class FlaskHelloWorldTestCase(unittest.TestCase):
         self.assertEqual(mock_pyautogui.write.call_count, 2)
         mock_pyautogui.hotkey.assert_called_once_with('shift', 'enter')
 
-        mock_pyautogui.write.reset_mock()
-        mock_pyautogui.hotkey.reset_mock()
-
     def test_submit_route_without_shift_enter(self):
         test_text = "Line 1\nLine 2"
         response = self.app.post('/type', data={'text': test_text})
@@ -54,9 +57,6 @@ class FlaskHelloWorldTestCase(unittest.TestCase):
         # Verify pyautogui.write and hotkey were called
         mock_pyautogui.write.assert_called_once_with(test_text)
         mock_pyautogui.hotkey.assert_not_called()
-
-        mock_pyautogui.write.reset_mock()
-        mock_pyautogui.hotkey.reset_mock()
 
 
 if __name__ == '__main__':
