@@ -1,9 +1,8 @@
 # Phone Keyboard
-
+![App icon](static/favicon.svg)
 A simple Flask application to enable me to type on a computer using my phone's touch and voice keyboard. Authored using [Google Jules](https://jules.google.com/).
 
 ## Installation
-
 ### Standard installation
 ```bash
 pip install .
@@ -15,7 +14,6 @@ pip install -e .
 ```
 
 ## Usage
-
 ### Run with Python
 ```bash
 python3 app.py
