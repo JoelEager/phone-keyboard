@@ -13,17 +13,24 @@
             min-height: 100vh;
             margin: 0;
             padding-top: 5px;
+            padding-bottom: 20px;
             box-sizing: border-box;
             background-color: #121212;
         }
-        form {
+        .container {
+            width: 90%;
+            max-width: 400px;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+        .card {
             background: #1e1e1e;
             color: #e0e0e0;
             padding: 20px;
             border-radius: 8px;
             box-shadow: 0 4px 6px rgba(0,0,0,0.3);
-            width: 90%;
-            max-width: 400px;
+            box-sizing: border-box;
         }
         textarea {
             width: 100%;
@@ -68,22 +75,79 @@
         .checkbox-container input {
             margin-right: 8px;
         }
+        .shortcut-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+        }
+        .shortcut-btn {
+            aspect-ratio: 1 / 1;
+            background-color: #2c2c2c;
+            color: #e0e0e0;
+            border: 1px solid #444;
+            border-radius: 8px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            gap: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            padding: 8px;
+            box-sizing: border-box;
+            width: 100%;
+        }
+        .shortcut-btn:active {
+            background-color: #3c3c3c;
+            border-color: #bb86fc;
+        }
+        .shortcut-btn svg {
+            width: 28px;
+            height: 28px;
+            fill: none;
+            stroke: #bb86fc;
+            stroke-width: 2;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+        }
     </style>
 </head>
 <body>
-    <form action="/type" method="post">
-        <textarea id="message_text" name="text" rows="9" placeholder="Type here..." autocapitalize="sentences"></textarea><br>
-        <div class="checkbox-container">
-            <input type="checkbox" id="use_shift_enter" name="use_shift_enter" checked>
-            <label for="use_shift_enter">Use Shift+Enter for newlines</label>
-        </div>
-        <div class="checkbox-container">
-            <input type="checkbox" id="autocapitalize_toggle" checked>
-            <label for="autocapitalize_toggle">Auto-capitalize first word</label>
-        </div>
-        <input type="submit" value="Post">
-        <div id="wake-lock-status">Stay Awake: Inactive</div>
-    </form>
+    <div class="container">
+        <form action="/type" method="post" class="card">
+            <textarea id="message_text" name="text" rows="9" placeholder="Type here..." autocapitalize="sentences"></textarea><br>
+            <div class="checkbox-container">
+                <input type="checkbox" id="use_shift_enter" name="use_shift_enter" checked>
+                <label for="use_shift_enter">Use Shift+Enter for newlines</label>
+            </div>
+            <div class="checkbox-container">
+                <input type="checkbox" id="autocapitalize_toggle" checked>
+                <label for="autocapitalize_toggle">Auto-capitalize first word</label>
+            </div>
+            <input type="submit" value="Post">
+            <div id="wake-lock-status">Stay Awake: Inactive</div>
+        </form>
+
+        <form action="/shortcut" method="post" class="card shortcut-grid">
+            <button type="submit" name="action" value="copy" class="shortcut-btn">
+                <svg viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+                <span>Copy</span>
+            </button>
+            <button type="submit" name="action" value="window_switch" class="shortcut-btn">
+                <svg viewBox="0 0 24 24"><path d="M8 7h11M15 3l4 4-4 4M16 17H5M9 21l-4-4 4-4"></path></svg>
+                <span>Window Switch</span>
+            </button>
+            <button type="submit" name="action" value="paste" class="shortcut-btn">
+                <svg viewBox="0 0 24 24"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"></path><rect x="8" y="2" width="8" height="4" rx="1" ry="1"></rect></svg>
+                <span>Paste</span>
+            </button>
+            <button type="submit" name="action" value="close_tab" class="shortcut-btn">
+                <svg viewBox="0 0 24 24"><path d="M18 6L6 18M6 6l12 12"></path></svg>
+                <span>Close Tab</span>
+            </button>
+        </form>
+    </div>
+
     <script>
         let wakeLock = null;
         let isEnabled = false;

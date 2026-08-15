@@ -22,7 +22,8 @@ class FlaskHelloWorldTestCase(unittest.TestCase):
         response = self.app.get('/')
         self.assertEqual(response.status_code, 200)
         self.assertIn(b'<title>Phone Keyboard</title>', response.data)
-        self.assertIn(b'<form action="/type" method="post">', response.data)
+        self.assertIn(b'<form action="/type" method="post"', response.data)
+        self.assertIn(b'<form action="/shortcut" method="post"', response.data)
         self.assertIn(
             b'<textarea id="message_text" name="text"', response.data
         )
@@ -33,6 +34,16 @@ class FlaskHelloWorldTestCase(unittest.TestCase):
         self.assertIn(b'checked', response.data)
         self.assertIn(b'id="autocapitalize_toggle"', response.data)
         self.assertIn(b'Auto-capitalize first word', response.data)
+
+        # Check shortcut grid items
+        self.assertIn(b'value="copy"', response.data)
+        self.assertIn(b'Copy</span>', response.data)
+        self.assertIn(b'value="window_switch"', response.data)
+        self.assertIn(b'Window Switch</span>', response.data)
+        self.assertIn(b'value="paste"', response.data)
+        self.assertIn(b'Paste</span>', response.data)
+        self.assertIn(b'value="close_tab"', response.data)
+        self.assertIn(b'Close Tab</span>', response.data)
 
     def test_submit_route_redirects(self):
         test_text = "Line 1\nLine 2"
@@ -57,6 +68,30 @@ class FlaskHelloWorldTestCase(unittest.TestCase):
         # Verify pyautogui.write and hotkey were called
         mock_pyautogui.write.assert_called_once_with(test_text)
         mock_pyautogui.hotkey.assert_not_called()
+
+    def test_shortcut_route_copy(self):
+        response = self.app.post('/shortcut', data={'action': 'copy'})
+        self.assertEqual(response.status_code, 302)
+        self.assertTrue(response.location.endswith('/'))
+        mock_pyautogui.hotkey.assert_called_once_with('ctrl', 'c')
+
+    def test_shortcut_route_window_switch(self):
+        response = self.app.post('/shortcut', data={'action': 'window_switch'})
+        self.assertEqual(response.status_code, 302)
+        self.assertTrue(response.location.endswith('/'))
+        mock_pyautogui.hotkey.assert_called_once_with('alt', 'tab')
+
+    def test_shortcut_route_paste(self):
+        response = self.app.post('/shortcut', data={'action': 'paste'})
+        self.assertEqual(response.status_code, 302)
+        self.assertTrue(response.location.endswith('/'))
+        mock_pyautogui.hotkey.assert_called_once_with('ctrl', 'v')
+
+    def test_shortcut_route_close_tab(self):
+        response = self.app.post('/shortcut', data={'action': 'close_tab'})
+        self.assertEqual(response.status_code, 302)
+        self.assertTrue(response.location.endswith('/'))
+        mock_pyautogui.hotkey.assert_called_once_with('ctrl', 'w')
 
 
 if __name__ == '__main__':

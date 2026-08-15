@@ -49,6 +49,27 @@ def type_text():
     return redirect(url_for('index'))
 
 
+@app.route('/shortcut', methods=['POST'])
+def shortcut():
+    action = request.form.get('action')
+
+    if action:
+        print(f'Received shortcut: {action}', flush=True)
+        try:
+            if action == 'copy':
+                pyautogui.hotkey('ctrl', 'c')
+            elif action == 'window_switch':
+                pyautogui.hotkey('alt', 'tab')
+            elif action == 'paste':
+                pyautogui.hotkey('ctrl', 'v')
+            elif action == 'close_tab':
+                pyautogui.hotkey('ctrl', 'w')
+        except Exception as e:
+            print(f'Error executing shortcut {action}: {e}', file=sys.stderr)
+
+    return redirect(url_for('index'))
+
+
 def main():
     host = '0.0.0.0'
     port = 5000
