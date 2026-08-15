@@ -44,3 +44,6 @@ The application is configured to use HTTPS to enable the Screen Wake Lock JS API
 ```bash
 python3 test_app.py
 ```
+
+## Screenshot
+![Screenshot of phone UI](screenshot.jpg)
