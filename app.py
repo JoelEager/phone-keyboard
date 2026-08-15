@@ -67,7 +67,7 @@ def shortcut():
         except Exception as e:
             print(f'Error executing shortcut {action}: {e}', file=sys.stderr)
 
-    return redirect(url_for('index'))
+    return redirect(url_for('index') + '#shortcuts')
 
 
 def main():

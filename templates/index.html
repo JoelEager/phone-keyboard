@@ -73,7 +73,7 @@
         .checkbox-container input {
             margin-right: 8px;
         }
-        .shortcut-grid {
+        #shortcuts {
             display: grid;
             grid-template-columns: 1fr 1fr;
             gap: 12px;
@@ -126,7 +126,7 @@
             <div id="wake-lock-status">Stay Awake: Inactive</div>
         </form>
 
-        <form action="/shortcut" method="post" class="shortcut-grid">
+        <form id="shortcuts" action="/shortcut" method="post">
             <button type="submit" name="action" value="copy" class="shortcut-btn">
                 <svg viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
                 <span>Copy</span>
