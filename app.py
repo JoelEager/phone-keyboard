@@ -58,10 +58,10 @@ def shortcut():
         try:
             if action == 'copy':
                 pyautogui.hotkey('ctrl', 'c')
-            elif action == 'window_switch':
-                pyautogui.hotkey('alt', 'tab')
             elif action == 'paste':
                 pyautogui.hotkey('ctrl', 'v')
+            elif action == 'window_switch':
+                pyautogui.hotkey('alt', 'tab')
             elif action == 'close_tab':
                 pyautogui.hotkey('ctrl', 'w')
         except Exception as e:
