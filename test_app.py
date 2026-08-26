@@ -23,7 +23,7 @@ class FlaskHelloWorldTestCase(unittest.TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertIn(b'<title>Phone Keyboard</title>', response.data)
         self.assertIn(b'<form action="/type" method="post"', response.data)
-        self.assertIn(b'<form action="/shortcut" method="post"', response.data)
+        self.assertIn(b'<form id="shortcuts" action="/shortcut" method="post">', response.data)
         self.assertIn(
             b'<textarea id="message_text" name="text"', response.data
         )
@@ -72,25 +72,25 @@ class FlaskHelloWorldTestCase(unittest.TestCase):
     def test_shortcut_route_copy(self):
         response = self.app.post('/shortcut', data={'action': 'copy'})
         self.assertEqual(response.status_code, 302)
-        self.assertTrue(response.location.endswith('/'))
+        self.assertTrue(response.location.endswith('/#shortcuts'))
         mock_pyautogui.hotkey.assert_called_once_with('ctrl', 'c')
 
     def test_shortcut_route_window_switch(self):
         response = self.app.post('/shortcut', data={'action': 'window_switch'})
         self.assertEqual(response.status_code, 302)
-        self.assertTrue(response.location.endswith('/'))
+        self.assertTrue(response.location.endswith('/#shortcuts'))
         mock_pyautogui.hotkey.assert_called_once_with('alt', 'tab')
 
     def test_shortcut_route_paste(self):
         response = self.app.post('/shortcut', data={'action': 'paste'})
         self.assertEqual(response.status_code, 302)
-        self.assertTrue(response.location.endswith('/'))
+        self.assertTrue(response.location.endswith('/#shortcuts'))
         mock_pyautogui.hotkey.assert_called_once_with('ctrl', 'v')
 
     def test_shortcut_route_close_tab(self):
         response = self.app.post('/shortcut', data={'action': 'close_tab'})
         self.assertEqual(response.status_code, 302)
-        self.assertTrue(response.location.endswith('/'))
+        self.assertTrue(response.location.endswith('/#shortcuts'))
         mock_pyautogui.hotkey.assert_called_once_with('ctrl', 'w')
 
 
