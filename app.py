@@ -1,17 +1,20 @@
-import sys
+import logging
 import os
 import secrets
-from flask import Flask, request, redirect, url_for, render_template, session
+import sys
+from flask import Flask, redirect, render_template, request, session, url_for
 from generate_cert import generate_certificate
+
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
 
 # Attempt to import pyautogui, handle cases where DISPLAY is not set
 try:
     import pyautogui
 except Exception as e:
-    print(
-        f"Error: Failed to import 'pyautogui'. Ensure it is installed and "
-        f"the DISPLAY environment variable is set. Details: {e}",
-        file=sys.stderr
+    logger.error(
+        f"Failed to import 'pyautogui'. Ensure it is installed and "
+        f"the DISPLAY environment variable is set. Details: {e}"
     )
     sys.exit(1)
 
@@ -21,120 +24,110 @@ FAILED_ATTEMPTS = 0
 
 app = Flask(__name__)
 app.secret_key = secrets.token_hex(32)
+app.logger.setLevel(logging.DEBUG)
 
 
 @app.before_request
 def require_authentication():
     # Allow static resources and login endpoint without auth
-    if request.endpoint in ('static', 'login'):
+    if request.endpoint in ("static", "login"):
         return None
 
-    if not session.get('authenticated'):
-        if request.endpoint == 'type_text':
-            text = request.form.get('text')
-            print(
-                f'Unauthenticated request to /type ignored. Payload text: '
-                f'{text}',
-                flush=True
+    if not session.get("authenticated"):
+        if request.endpoint == "type_text":
+            text = request.form.get("text")
+            app.logger.warning(
+                f"Unauthenticated request to /type ignored. Payload text: "
+                f"{text}"
             )
-        elif request.endpoint == 'shortcut':
-            action = request.form.get('action')
-            print(
-                f'Unauthenticated request to /shortcut ignored. '
-                f'Payload action: {action}',
-                flush=True
+        elif request.endpoint == "shortcut":
+            action = request.form.get("action")
+            app.logger.warning(
+                f"Unauthenticated request to /shortcut ignored. "
+                f"Payload action: {action}"
             )
 
-        return redirect(url_for('login'))
+        return redirect(url_for("login"))
 
 
-@app.route('/')
+@app.route("/")
 def index():
-    return render_template('index.html')
+    return render_template("index.html")
 
 
-@app.route('/login', methods=['GET', 'POST'])
+@app.route("/login", methods=["GET", "POST"])
 def login():
     global FAILED_ATTEMPTS
 
-    if session.get('authenticated'):
-        return redirect(url_for('index'))
+    if session.get("authenticated"):
+        return redirect(url_for("index"))
 
-    if FAILED_ATTEMPTS < 4 and request.method == 'GET':
-        return render_template('login.html')
+    if FAILED_ATTEMPTS < 4 and request.method == "GET":
+        return render_template("login.html")
 
-    pin = request.form.get('pin', '')
+    pin = request.form.get("pin", "")
     if FAILED_ATTEMPTS < 5 and secrets.compare_digest(pin, SERVER_PIN):
-        print("New client authenticated")
+        app.logger.info("New client authenticated")
         FAILED_ATTEMPTS = 0
-        session['authenticated'] = True
-        return redirect(url_for('index'))
+        session["authenticated"] = True
+        return redirect(url_for("index"))
     elif FAILED_ATTEMPTS < 4:
         FAILED_ATTEMPTS += 1
-        print(
-            f"Invalid PIN attempt ({FAILED_ATTEMPTS}/5)",
-            file=sys.stderr,
-            flush=True
-        )
-        return render_template('login.html', error="Invalid PIN"), 401
-    
-    print(
-        f"Restart the server to re-enable PIN authentication",
-        file=sys.stderr,
-        flush=True
-    )
+        app.logger.warning(f"Invalid PIN attempt ({FAILED_ATTEMPTS}/5)")
+        return render_template("login.html", error="Invalid PIN"), 401
+
+    app.logger.error("Restart the server to re-enable PIN authentication")
     return "Server not accepting further authentication requests", 401
 
 
-@app.route('/type', methods=['POST'])
+@app.route("/type", methods=["POST"])
 def type_text():
-    text = request.form.get('text')
+    text = request.form.get("text")
 
     if text:
-        # Echo to stdout
-        print(f'Received text: {text}', flush=True)
+        app.logger.debug(f"Received text: {text}")
 
         # Type the text using pyautogui
         try:
-            use_shift_enter = request.form.get('use_shift_enter')
+            use_shift_enter = request.form.get("use_shift_enter")
             if use_shift_enter:
                 lines = text.splitlines()
                 for i, line in enumerate(lines):
                     pyautogui.write(line)
                     if i < len(lines) - 1:
-                        pyautogui.hotkey('shift', 'enter')
+                        pyautogui.hotkey("shift", "enter")
             else:
                 pyautogui.write(text)
         except Exception as e:
-            print(f'Error typing text: {e}', file=sys.stderr)
+            app.logger.error(f"Error typing text: {e}")
 
     # Redirect back to the form
-    return redirect(url_for('index'))
+    return redirect(url_for("index"))
 
 
-@app.route('/shortcut', methods=['POST'])
+@app.route("/shortcut", methods=["POST"])
 def shortcut():
-    action = request.form.get('action')
+    action = request.form.get("action")
 
     if action:
-        print(f'Received shortcut: {action}', flush=True)
+        app.logger.debug(f"Received shortcut: {action}")
         try:
-            if action == 'copy':
-                pyautogui.hotkey('ctrl', 'c')
-            elif action == 'paste':
-                pyautogui.hotkey('ctrl', 'v')
-            elif action == 'window_switch':
-                pyautogui.hotkey('alt', 'tab')
-            elif action == 'close_tab':
-                pyautogui.hotkey('ctrl', 'w')
+            if action == "copy":
+                pyautogui.hotkey("ctrl", "c")
+            elif action == "paste":
+                pyautogui.hotkey("ctrl", "v")
+            elif action == "window_switch":
+                pyautogui.hotkey("alt", "tab")
+            elif action == "close_tab":
+                pyautogui.hotkey("ctrl", "w")
         except Exception as e:
-            print(f'Error executing shortcut: {e}', file=sys.stderr)
+            app.logger.error(f"Error executing shortcut: {e}")
 
-    return redirect(url_for('index') + '#shortcuts')
+    return redirect(url_for("index") + "#shortcuts")
 
 
 def main():
-    host = '0.0.0.0'
+    host = "0.0.0.0"
     port = 5000
 
     repo_root = os.path.dirname(os.path.abspath(__file__))
@@ -144,26 +137,22 @@ def main():
     # Check if certificate files exist, if not generate them
     if not (os.path.exists(cert_path) and os.path.exists(key_path)):
         if not generate_certificate(repo_root):
-            print(
-                "Error: Failed to generate SSL certificates. "
-                "HTTPS is required. Exiting.",
-                file=sys.stderr,
-                flush=True
+            app.logger.error(
+                "Failed to generate SSL certificates. "
+                "HTTPS is required. Exiting."
             )
             sys.exit(1)
 
     if not (os.path.exists(cert_path) and os.path.exists(key_path)):
-        print(
-            "Error: SSL certificate or key file missing. "
-            "HTTPS is required. Exiting.",
-            file=sys.stderr,
-            flush=True
+        app.logger.error(
+            "SSL certificate or key file missing. "
+            "HTTPS is required. Exiting."
         )
         sys.exit(1)
 
-    print(f"=== Authentication PIN: {SERVER_PIN} ===", flush=True)
+    app.logger.info(f"=== Authentication PIN: {SERVER_PIN} ===")
     app.run(host=host, port=port, ssl_context=(cert_path, key_path))
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

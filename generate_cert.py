@@ -1,6 +1,9 @@
-import subprocess
-import socket
+import logging
 import os
+import socket
+import subprocess
+
+logger = logging.getLogger(__name__)
 
 
 def get_local_ip():
@@ -11,7 +14,7 @@ def get_local_ip():
             s.connect(("8.8.8.8", 80))
             return s.getsockname()[0]
     except Exception:
-        return '127.0.0.1'
+        return "127.0.0.1"
 
 
 def generate_certificate(output_dir):
@@ -21,7 +24,7 @@ def generate_certificate(output_dir):
     key_path = os.path.join(output_dir, "key.pem")
 
     local_ip = get_local_ip()
-    print(f"Generating self-signed certificate for {local_ip}")
+    logger.info(f"Generating self-signed certificate for {local_ip}")
 
     cmd = [
         "openssl", "req", "-x509", "-newkey", "rsa:4096",
@@ -34,8 +37,10 @@ def generate_certificate(output_dir):
 
     try:
         subprocess.run(cmd, check=True)
-        print(f"Certificate and key generated successfully in {output_dir}.")
+        logger.info(
+            f"Certificate and key generated successfully in {output_dir}."
+        )
     except (subprocess.CalledProcessError, FileNotFoundError) as e:
-        print(f"Error generating certificate: {e}")
+        logger.error(f"Error generating certificate: {e}")
         return False
     return True
