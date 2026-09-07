@@ -1,6 +1,7 @@
 import logging
 import os
 import secrets
+import socket
 import sys
 import pyautogui
 from flask import Flask, redirect, render_template, request, session, url_for
@@ -14,6 +15,11 @@ print(f"=== Authentication PIN: {SERVER_PIN} ===")
 app = Flask(__name__)
 app.secret_key = secrets.token_hex(32)
 app.logger.setLevel(logging.DEBUG)
+
+
+@app.context_processor
+def inject_hostname():
+    return dict(hostname=socket.gethostname())
 
 
 @app.before_request

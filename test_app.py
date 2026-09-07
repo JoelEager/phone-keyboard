@@ -1,3 +1,4 @@
+import socket
 import sys
 import unittest
 from unittest.mock import MagicMock, patch
@@ -75,9 +76,11 @@ class FlaskAppTestCase(unittest.TestCase):
             )
 
         # Verify now authenticated and can access index
+        hostname = socket.gethostname()
+        expected_title = f"<title>{hostname} - Phone Keyboard</title>".encode()
         response = self.app.get("/")
         self.assertEqual(response.status_code, 200)
-        self.assertIn(b"<title>Phone Keyboard</title>", response.data)
+        self.assertIn(expected_title, response.data)
 
     def test_invalid_pin_login(self):
         invalid_pin = "00000" if app_module.SERVER_PIN != "00000" else "11111"
@@ -124,7 +127,9 @@ class FlaskAppTestCase(unittest.TestCase):
         self._authenticate()
         response = self.app.get("/")
         self.assertEqual(response.status_code, 200)
-        self.assertIn(b"<title>Phone Keyboard</title>", response.data)
+        hostname = socket.gethostname()
+        expected_title = f"<title>{hostname} - Phone Keyboard</title>".encode()
+        self.assertIn(expected_title, response.data)
         self.assertIn(b'<form action="/type" method="post"', response.data)
         self.assertIn(
             b'<form id="shortcuts" action="/shortcut" method="post">',
