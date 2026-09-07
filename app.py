@@ -2,25 +2,14 @@ import logging
 import os
 import secrets
 import sys
+import pyautogui
 from flask import Flask, redirect, render_template, request, session, url_for
 from generate_cert import generate_certificate
-
-logging.basicConfig(level=logging.INFO)
-logger = logging.getLogger(__name__)
-
-# Attempt to import pyautogui, handle cases where DISPLAY is not set
-try:
-    import pyautogui
-except Exception as e:
-    logger.error(
-        f"Failed to import 'pyautogui'. Ensure it is installed and "
-        f"the DISPLAY environment variable is set. Details: {e}"
-    )
-    sys.exit(1)
 
 
 SERVER_PIN = f"{secrets.randbelow(100000):05d}"
 FAILED_ATTEMPTS = 0
+print(f"=== Authentication PIN: {SERVER_PIN} ===")
 
 app = Flask(__name__)
 app.secret_key = secrets.token_hex(32)
@@ -37,14 +26,12 @@ def require_authentication():
         if request.endpoint == "type_text":
             text = request.form.get("text")
             app.logger.warning(
-                f"Unauthenticated request to /type ignored. Payload text: "
-                f"{text}"
+                f"Unauthenticated request to /type ignored. Payload text: {text}"
             )
         elif request.endpoint == "shortcut":
             action = request.form.get("action")
             app.logger.warning(
-                f"Unauthenticated request to /shortcut ignored. "
-                f"Payload action: {action}"
+                f"Unauthenticated request to /shortcut ignored. Payload action: {action}"
             )
 
         return redirect(url_for("login"))
@@ -86,8 +73,6 @@ def type_text():
 
     if text:
         app.logger.debug(f"Received text: {text}")
-
-        # Type the text using pyautogui
         try:
             use_shift_enter = request.form.get("use_shift_enter")
             if use_shift_enter:
@@ -101,7 +86,6 @@ def type_text():
         except Exception as e:
             app.logger.error(f"Error typing text: {e}")
 
-    # Redirect back to the form
     return redirect(url_for("index"))
 
 
@@ -150,7 +134,6 @@ def main():
         )
         sys.exit(1)
 
-    app.logger.info(f"=== Authentication PIN: {SERVER_PIN} ===")
     app.run(host=host, port=port, ssl_context=(cert_path, key_path))
 
 

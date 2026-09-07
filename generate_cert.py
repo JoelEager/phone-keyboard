@@ -30,7 +30,7 @@ def generate_certificate(output_dir):
         "openssl", "req", "-x509", "-newkey", "rsa:4096",
         "-keyout", key_path, "-out", cert_path,
         "-sha256", "-days", "365", "-nodes",
-        "-subj", "/C=US/ST=State/L=City/O=Joel local phone keyboard/"
+        "-subj", "/C=US/ST=State/L=City/O=Phone Keyboard Flask App/"
                  f"OU=Unit/CN={local_ip}",
         "-addext", f"subjectAltName=IP:{local_ip},IP:127.0.0.1,DNS:localhost"
     ]
