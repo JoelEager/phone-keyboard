@@ -2,7 +2,12 @@
 ![App icon](static/favicon.svg)
 A simple Flask application to enable the user to type on a computer using their phone's touch and voice keyboard for improved accessibility. Mostly vibe coded using [Google Jules](https://jules.google.com/).
 
-**Security warning:** This application accepts keystroke commands from any browser that connects to it. Do not run it on untrusted networks and never port forward it to the broader internet.
+**Security Warning:** This application simulates physical keypresses on the host computer. While connections are strictly restricted to HTTPS and require a 5-digit authentication PIN printed to the server console, you should still avoid running it on untrusted public networks or port-forwarding it to the open internet.
+
+## Authentication & Security
+- **Mandatory HTTPS:** All traffic is encrypted via HTTPS using automatically generated local SSL certificates (`cert.pem` and `key.pem`).
+- **5-Digit PIN:** When the server starts, a random 5-digit PIN and secret session key are generated and printed to the server logs. Clients must enter this PIN to authenticate.
+- **Brute Force Protection:** If 5 invalid PIN attempts are received globally across the server process, the application automatically logs an error and exits to prevent brute-force attacks.
 
 ## Installation and Usage
 After cloning the repo install the package in editable mode:
@@ -15,10 +20,15 @@ Run it via the console script:
 phone-keyboard
 ```
 
-Then point your phone's browser at the server and start typing.
+When started, note the 5-digit authentication PIN displayed in the terminal output:
+```
+Authentication PIN: 12345
+```
 
-### Optional HTTPS Setup
-To enable the Screen Wake Lock JS API the application needs an HTTPS connection to your phone.
+Open your phone's browser at `https://<computer-ip>:5000/`, enter the PIN when prompted, and start typing.
+
+### HTTPS & Certificate Setup
+HTTPS is required both for server communication and to enable the Screen Wake Lock JS API on your phone.
 1. The application will automatically generate `cert.pem` and `key.pem` the first time it runs, specific to your local IP address.
 2. Transfer `cert.pem` to your device.
 3. Install it:
