@@ -4,11 +4,6 @@ A simple Flask application to enable the user to type on a computer using their 
 
 **Security Warning:** This application simulates physical keypresses on the host computer. While connections are strictly restricted to HTTPS and require a 5-digit authentication PIN printed to the server console, you should still avoid running it on untrusted public networks or port-forwarding it to the open internet.
 
-## Authentication & Security
-- **Mandatory HTTPS:** All traffic is encrypted via HTTPS using automatically generated local SSL certificates (`cert.pem` and `key.pem`).
-- **5-Digit PIN:** When the server starts, a random 5-digit PIN and secret session key are generated and printed to the server logs. Clients must enter this PIN to authenticate.
-- **Brute Force Protection:** If 5 invalid PIN attempts are received globally across the server process, the application automatically logs an error and exits to prevent brute-force attacks.
-
 ## Installation and Usage
 After cloning the repo install the package in editable mode:
 ```sh
@@ -18,11 +13,6 @@ pip install -e .
 Run it via the console script:
 ```sh
 phone-keyboard
-```
-
-When started, note the 5-digit authentication PIN displayed in the terminal output:
-```
-Authentication PIN: 12345
 ```
 
 Open your phone's browser at `https://<computer-ip>:5000/`, enter the PIN when prompted, and start typing.

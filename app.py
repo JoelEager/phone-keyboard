@@ -45,7 +45,7 @@ def require_authentication():
                 flush=True
             )
 
-        return render_template('login.html'), 200
+        return redirect(url_for('login'))
 
 
 @app.route('/')
@@ -57,36 +57,33 @@ def index():
 def login():
     global FAILED_ATTEMPTS
 
-    if request.method == 'GET':
-        if session.get('authenticated'):
-            return redirect(url_for('index'))
+    if session.get('authenticated'):
+        return redirect(url_for('index'))
+
+    if FAILED_ATTEMPTS < 4 and request.method == 'GET':
         return render_template('login.html')
 
     pin = request.form.get('pin', '')
-    if secrets.compare_digest(pin, SERVER_PIN):
+    if FAILED_ATTEMPTS < 5 and secrets.compare_digest(pin, SERVER_PIN):
+        print("New client authenticated")
         FAILED_ATTEMPTS = 0
         session['authenticated'] = True
         return redirect(url_for('index'))
-    else:
+    elif FAILED_ATTEMPTS < 4:
         FAILED_ATTEMPTS += 1
         print(
             f"Invalid PIN attempt ({FAILED_ATTEMPTS}/5)",
             file=sys.stderr,
             flush=True
         )
-        if FAILED_ATTEMPTS >= 5:
-            print(
-                "Error: Maximum failed authentication attempts (5) reached. "
-                "Exiting process to prevent brute forcing.",
-                file=sys.stderr,
-                flush=True
-            )
-            sys.exit(1)
-
-        error_msg = (
-            f"Invalid PIN. {5 - FAILED_ATTEMPTS} attempt(s) remaining."
-        )
-        return render_template('login.html', error=error_msg), 401
+        return render_template('login.html', error="Invalid PIN"), 401
+    
+    print(
+        f"Restart the server to re-enable PIN authentication",
+        file=sys.stderr,
+        flush=True
+    )
+    return "Server not accepting further authentication requests", 401
 
 
 @app.route('/type', methods=['POST'])
@@ -131,7 +128,7 @@ def shortcut():
             elif action == 'close_tab':
                 pyautogui.hotkey('ctrl', 'w')
         except Exception as e:
-            print(f'Error executing shortcut {action}: {e}', file=sys.stderr)
+            print(f'Error executing shortcut: {e}', file=sys.stderr)
 
     return redirect(url_for('index') + '#shortcuts')
 
@@ -164,7 +161,7 @@ def main():
         )
         sys.exit(1)
 
-    print(f"Authentication PIN: {SERVER_PIN}", flush=True)
+    print(f"=== Authentication PIN: {SERVER_PIN} ===", flush=True)
     app.run(host=host, port=port, ssl_context=(cert_path, key_path))
 
 
